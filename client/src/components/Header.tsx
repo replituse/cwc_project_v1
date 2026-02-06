@@ -124,15 +124,17 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
       <div className="flex items-center gap-3 px-4 py-1.5">
         <img src={folderIcon} alt="Folder" className="w-10 h-10 object-contain" />
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5">
-            <span className="text-lg font-normal leading-tight text-[#3c4043]">{projectName}</span>
-            <button className="text-[#5f6368] hover:bg-[#f1f3f4] p-1 rounded-full transition-colors">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </button>
+          <div className="flex items-center gap-1.5 h-7">
+            <input
+              className="text-lg font-normal leading-tight text-black bg-transparent border-none focus:ring-1 focus:ring-[#1a73e8] px-1 -ml-1 rounded cursor-text outline-none hover:bg-[#f1f3f4]"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              onBlur={() => toast({ title: "Project Renamed", description: `Project name changed to ${projectName}` })}
+            />
           </div>
           <Menubar className="border-none bg-transparent shadow-none h-auto p-0 min-h-0">
             <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">File</MenubarTrigger>
+              <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">File</MenubarTrigger>
               <MenubarContent>
                 <MenubarItem onClick={clearNetwork} className="gap-2">
                   <FilePlus className="w-4 h-4" /> New
@@ -151,32 +153,6 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                   <DownloadCloud className="w-4 h-4" /> Download (.inp)
                 </MenubarItem>
                 <MenubarSeparator />
-                <Dialog open={isRenameOpen} onOpenChange={setIsRenameOpen}>
-                  <DialogTrigger asChild>
-                    <MenubarItem onSelect={(e) => e.preventDefault()} className="gap-2">
-                      <Type className="w-4 h-4" /> Rename
-                    </MenubarItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Rename Project</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="project-name">Project Name</Label>
-                        <Input 
-                          id="project-name" 
-                          value={tempProjectName} 
-                          onChange={(e) => setTempProjectName(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={handleRename}>Save Changes</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
                 <MenubarItem onClick={clearNetwork} className="gap-2 text-destructive focus:text-destructive">
                   <Eraser className="w-4 h-4" /> Clear Canvas
                 </MenubarItem>
@@ -187,7 +163,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Edit</MenubarTrigger>
+              <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Edit</MenubarTrigger>
               <MenubarContent>
                 <MenubarItem onClick={undo} disabled={history.past.length === 0} className="gap-2">
                   <Undo2 className="w-4 h-4" /> Undo <MenubarShortcut>⌘Z</MenubarShortcut>
@@ -211,7 +187,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">View</MenubarTrigger>
+              <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">View</MenubarTrigger>
               <MenubarContent>
                 <MenubarItem>Full Screen</MenubarItem>
                 <MenubarItem>Show Grid</MenubarItem>
@@ -219,7 +195,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Insert</MenubarTrigger>
+              <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Insert</MenubarTrigger>
               <MenubarContent>
                 <MenubarItem onClick={() => addNode('reservoir', { x: 100, y: 100 })} className="gap-2">
                   <Cylinder className="w-4 h-4 text-blue-600" /> Reservoir
@@ -240,15 +216,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Format</MenubarTrigger>
-              <MenubarContent>
-                <MenubarItem>Text Style</MenubarItem>
-                <MenubarItem>Alignment</MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
-
-            <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Tools</MenubarTrigger>
+              <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Tools</MenubarTrigger>
               <MenubarContent>
                 <Dialog>
                   <DialogTrigger asChild>
@@ -380,15 +348,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Extensions</MenubarTrigger>
-              <MenubarContent>
-                <MenubarItem>Add-ons</MenubarItem>
-                <MenubarItem>Apps Script</MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
-
-            <MenubarMenu>
-              <MenubarTrigger className="text-[14px] font-normal h-7 text-[#5f6368] hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Help</MenubarTrigger>
+              <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">Help</MenubarTrigger>
               <MenubarContent>
                 <MenubarItem>WHAMO Help</MenubarItem>
                 <MenubarItem>Shortcuts</MenubarItem>
@@ -396,6 +356,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             </MenubarMenu>
           </Menubar>
         </div>
+
 
         <div className="ml-auto flex items-center gap-2 pr-4">
           <Button 
