@@ -75,8 +75,8 @@ export function Toolbar({ onExport, onSave, onLoad }: { onExport: () => void, on
 
   const tools = [
     { label: 'Reservoir', icon: Cylinder, action: () => addNode('reservoir', { x: 100, y: 100 }), color: 'text-blue-600' },
-    { label: 'Node', icon: Circle, action: () => addNode('node', { x: 150, y: 150 }), color: 'text-slate-600' },
-    { label: 'Junction', icon: GitCommitHorizontal, action: () => addNode('junction', { x: 200, y: 150 }), color: 'text-red-600' },
+    { label: 'Node', icon: Circle, action: () => addNode('node', { x: 150, y: 150 }), color: 'text-blue-500' },
+    { label: 'Junction', icon: GitCommitHorizontal, action: () => addNode('junction', { x: 200, y: 150 }), color: 'text-red-500' },
     { label: 'Surge Tank', icon: PlusCircle, action: () => addNode('surgeTank', { x: 250, y: 100 }), color: 'text-orange-600' },
     { label: 'Flow BC', icon: ArrowRightCircle, action: () => addNode('flowBoundary', { x: 50, y: 150 }), color: 'text-green-600' },
   ];

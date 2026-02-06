@@ -1,6 +1,7 @@
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { clsx } from 'clsx';
 import { memo } from 'react';
+import reservoirImg from '@/assets/reservoir.png';
 
 // Common handle styles
 const HandleStyle = "w-2 h-2 bg-primary border border-white opacity-0 group-hover:opacity-100 transition-opacity";
@@ -9,29 +10,7 @@ const HandleStyle = "w-2 h-2 bg-primary border border-white opacity-0 group-hove
 export const ReservoirNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div className={clsx(
-      "w-[40px] h-[30px] rounded-sm border shadow-sm flex flex-col items-center justify-center transition-all group",
-      selected ? "border-primary ring-1 ring-primary/30 bg-blue-600" : "border-blue-400 bg-blue-500",
-    )}>
-      <Handle type="target" id="t-top" position={Position.Top} className={HandleStyle} />
-      <Handle type="source" id="s-top" position={Position.Top} className={HandleStyle} />
-      <Handle type="target" id="t-bottom" position={Position.Bottom} className={HandleStyle} />
-      <Handle type="source" id="s-bottom" position={Position.Bottom} className={HandleStyle} />
-      <Handle type="target" id="t-left" position={Position.Left} className={HandleStyle} />
-      <Handle type="source" id="s-left" position={Position.Left} className={HandleStyle} />
-      <Handle type="target" id="t-right" position={Position.Right} className={HandleStyle} />
-      <Handle type="source" id="s-right" position={Position.Right} className={HandleStyle} />
-      <div className="text-[10px] font-bold text-white">{data.label as React.ReactNode}</div>
-      <div className="absolute -top-6 text-[10px] font-medium text-blue-900">{data.label as React.ReactNode}</div>
-    </div>
-  );
-});
-
-// Basic Node
-export const SimpleNode = memo(({ data, selected }: NodeProps) => {
-  return (
-    <div className={clsx(
-      "w-4 h-4 rounded-full border shadow-sm flex items-center justify-center transition-all relative group",
-      selected ? "bg-primary border-primary ring-2 ring-primary/30" : "bg-white border-slate-400"
+      "w-[50px] h-[50px] transition-all group relative flex items-center justify-center",
     )}>
       <Handle type="target" id="t-top" position={Position.Top} className={HandleStyle} />
       <Handle type="source" id="s-top" position={Position.Top} className={HandleStyle} />
@@ -42,10 +21,41 @@ export const SimpleNode = memo(({ data, selected }: NodeProps) => {
       <Handle type="target" id="t-right" position={Position.Right} className={HandleStyle} />
       <Handle type="source" id="s-right" position={Position.Right} className={HandleStyle} />
       
-      {/* Label tooltip on hover or always visible if selected? Let's do a floating label */}
-      <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-        Node {data.nodeNumber as React.ReactNode}
+      <img 
+        src={reservoirImg} 
+        alt="Reservoir" 
+        className={clsx(
+          "w-full h-full object-contain transition-all",
+          selected ? "drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" : ""
+        )} 
+      />
+      
+      <div className="absolute -top-6 text-[10px] font-bold text-blue-900 bg-white/80 px-1 rounded border border-blue-200 shadow-sm whitespace-nowrap">
+        {data.label as React.ReactNode}
       </div>
+    </div>
+  );
+});
+
+// Basic Node (Simple Node)
+export const SimpleNode = memo(({ data, selected }: NodeProps) => {
+  return (
+    <div className={clsx(
+      "w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center transition-all relative group bg-white",
+      selected ? "border-blue-600 ring-2 ring-blue-600/20" : "border-blue-500"
+    )}>
+      <div className="w-4 h-4 rounded-full border border-blue-400 bg-white flex items-center justify-center">
+        <span className="text-[8px] font-bold text-blue-600">n{data.nodeNumber as React.ReactNode}</span>
+      </div>
+
+      <Handle type="target" id="t-top" position={Position.Top} className={HandleStyle} />
+      <Handle type="source" id="s-top" position={Position.Top} className={HandleStyle} />
+      <Handle type="target" id="t-bottom" position={Position.Bottom} className={HandleStyle} />
+      <Handle type="source" id="s-bottom" position={Position.Bottom} className={HandleStyle} />
+      <Handle type="target" id="t-left" position={Position.Left} className={HandleStyle} />
+      <Handle type="source" id="s-left" position={Position.Left} className={HandleStyle} />
+      <Handle type="target" id="t-right" position={Position.Right} className={HandleStyle} />
+      <Handle type="source" id="s-right" position={Position.Right} className={HandleStyle} />
     </div>
   );
 });
@@ -54,9 +64,13 @@ export const SimpleNode = memo(({ data, selected }: NodeProps) => {
 export const JunctionNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div className={clsx(
-      "w-5 h-5 rounded-full border-2 shadow-sm flex items-center justify-center transition-all relative group",
-      selected ? "border-red-500 bg-red-100 ring-1 ring-red-500/30" : "border-red-500 bg-white"
+      "w-6 h-6 rounded-full border-2 shadow-sm flex items-center justify-center transition-all relative group bg-white",
+      selected ? "border-red-600 ring-2 ring-red-600/20" : "border-red-500"
     )}>
+      <div className="w-4 h-4 rounded-full border border-red-400 bg-white flex items-center justify-center">
+        <span className="text-[8px] font-bold text-red-600">J{data.nodeNumber as React.ReactNode}</span>
+      </div>
+
       <Handle type="target" id="t-top" position={Position.Top} className={clsx(HandleStyle, "!bg-red-500")} />
       <Handle type="source" id="s-top" position={Position.Top} className={clsx(HandleStyle, "!bg-red-500")} />
       <Handle type="target" id="t-bottom" position={Position.Bottom} className={clsx(HandleStyle, "!bg-red-500")} />
@@ -65,12 +79,6 @@ export const JunctionNode = memo(({ data, selected }: NodeProps) => {
       <Handle type="source" id="s-left" position={Position.Left} className={clsx(HandleStyle, "!bg-red-500")} />
       <Handle type="target" id="t-right" position={Position.Right} className={clsx(HandleStyle, "!bg-red-500")} />
       <Handle type="source" id="s-right" position={Position.Right} className={clsx(HandleStyle, "!bg-red-500")} />
-      
-      <div className="text-[8px] font-bold text-red-600">{data.nodeNumber as React.ReactNode}</div>
-      <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-        Node {data.nodeNumber as React.ReactNode}
-        {data.type === 'junction' && ' (Junction)'}
-      </div>
     </div>
   );
 });
