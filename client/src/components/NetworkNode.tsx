@@ -2,6 +2,7 @@ import { Handle, Position, NodeProps } from '@xyflow/react';
 import { clsx } from 'clsx';
 import { memo } from 'react';
 import reservoirImg from '@/assets/reservoir.png';
+import tankImg from '@/assets/tank.png';
 
 // Common handle styles
 const HandleStyle = "w-2 h-2 bg-primary border border-white opacity-0 group-hover:opacity-100 transition-opacity";
@@ -45,7 +46,7 @@ export const SimpleNode = memo(({ data, selected }: NodeProps) => {
       selected ? "border-blue-600 ring-2 ring-blue-600/20" : "border-blue-500"
     )}>
       <div className="w-4 h-4 rounded-full border border-blue-400 bg-white flex items-center justify-center">
-        <span className="text-[8px] font-bold text-blue-600">n{data.nodeNumber as React.ReactNode}</span>
+        <span className="text-[8px] font-bold text-blue-600">N{data.nodeNumber as React.ReactNode}</span>
       </div>
 
       <Handle type="target" id="t-top" position={Position.Top} className={HandleStyle} />
@@ -87,8 +88,7 @@ export const JunctionNode = memo(({ data, selected }: NodeProps) => {
 export const SurgeTankNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div className={clsx(
-      "px-3 py-4 rounded-t-lg rounded-b-md border-2 shadow-md min-w-[60px] flex flex-col items-center justify-between transition-all bg-orange-50 group",
-      selected ? "border-orange-500 ring-1 ring-orange-500/30" : "border-orange-400"
+      "w-[50px] h-[50px] transition-all group relative flex items-center justify-center",
     )}>
       <Handle type="target" id="t-top" position={Position.Top} className={clsx(HandleStyle, "!bg-orange-500")} />
       <Handle type="source" id="s-top" position={Position.Top} className={clsx(HandleStyle, "!bg-orange-500")} />
@@ -98,9 +98,19 @@ export const SurgeTankNode = memo(({ data, selected }: NodeProps) => {
       <Handle type="source" id="s-left" position={Position.Left} className={clsx(HandleStyle, "!bg-orange-500")} />
       <Handle type="target" id="t-right" position={Position.Right} className={clsx(HandleStyle, "!bg-orange-500")} />
       <Handle type="source" id="s-right" position={Position.Right} className={clsx(HandleStyle, "!bg-orange-500")} />
-      <div className="w-full h-2 border-b border-orange-200 mb-2"></div>
-      <div className="text-xs font-bold text-orange-800">{data.label as React.ReactNode}</div>
-      <div className="text-[10px] text-orange-600">ST</div>
+      
+      <img 
+        src={tankImg} 
+        alt="Surge Tank" 
+        className={clsx(
+          "w-full h-full object-contain transition-all",
+          selected ? "drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" : ""
+        )} 
+      />
+      
+      <div className="absolute -top-6 text-[10px] font-bold text-orange-900 bg-white/80 px-1 rounded border border-orange-200 shadow-sm whitespace-nowrap">
+        {data.label as React.ReactNode}
+      </div>
     </div>
   );
 });
