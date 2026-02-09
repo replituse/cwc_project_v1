@@ -1,0 +1,167 @@
+{
+  "projectName": "KAMALA H.E.PROJECT-UPSTREAM WCS-HRT-2",
+  "nodes": [
+    {
+      "id": "1",
+      "type": "reservoir",
+      "position": { "x": 0, "y": 0 },
+      "data": { "label": "HW", "nodeNumber": 1, "elevation": 1492.4 }
+    },
+    {
+      "id": "2",
+      "type": "node",
+      "position": { "x": 100, "y": 0 },
+      "data": { "label": "2", "nodeNumber": 2, "elevation": 1354.6 }
+    },
+    {
+      "id": "3",
+      "type": "node",
+      "position": { "x": 200, "y": 0 },
+      "data": { "label": "3", "nodeNumber": 3, "elevation": 1355.0 }
+    },
+    {
+      "id": "4",
+      "type": "node",
+      "position": { "x": 300, "y": 0 },
+      "data": { "label": "4", "nodeNumber": 4, "elevation": 1355.0 }
+    },
+    {
+      "id": "5",
+      "type": "node",
+      "position": { "x": 400, "y": 0 },
+      "data": { "label": "5", "nodeNumber": 5, "elevation": 1355.0 }
+    },
+    {
+      "id": "6",
+      "type": "node",
+      "position": { "x": 500, "y": 0 },
+      "data": { "label": "6", "nodeNumber": 6, "elevation": 1355.0 }
+    },
+    {
+      "id": "7",
+      "type": "node",
+      "position": { "x": 600, "y": 0 },
+      "data": { "label": "7", "nodeNumber": 7, "elevation": 1355.0 }
+    },
+    {
+      "id": "8",
+      "type": "junction",
+      "position": { "x": 700, "y": 0 },
+      "data": { "label": "8", "nodeNumber": 8, "elevation": 1298.6 }
+    },
+    {
+      "id": "9",
+      "type": "node",
+      "position": { "x": 800, "y": -50 },
+      "data": { "label": "9", "nodeNumber": 9, "elevation": 1298.6 }
+    },
+    {
+      "id": "10",
+      "type": "node",
+      "position": { "x": 900, "y": -50 },
+      "data": { "label": "10", "nodeNumber": 10, "elevation": 1298.6 }
+    },
+    {
+      "id": "11",
+      "type": "node",
+      "position": { "x": 1000, "y": -50 },
+      "data": { "label": "11", "nodeNumber": 11, "elevation": 1213.6 }
+    },
+    {
+      "id": "12",
+      "type": "node",
+      "position": { "x": 1100, "y": -50 },
+      "data": { "label": "12", "nodeNumber": 12, "elevation": 912.0 }
+    },
+    {
+      "id": "13",
+      "type": "node",
+      "position": { "x": 1200, "y": -50 },
+      "data": { "label": "13", "nodeNumber": 13, "elevation": 912.0 }
+    },
+    {
+      "id": "14",
+      "type": "flowBoundary",
+      "position": { "x": 1300, "y": -50 },
+      "data": { "label": "FB1", "nodeNumber": 14, "elevation": 908.2, "scheduleNumber": 1 }
+    },
+    {
+      "id": "15",
+      "type": "node",
+      "position": { "x": 800, "y": 50 },
+      "data": { "label": "15", "nodeNumber": 15, "elevation": 1298.6 }
+    },
+    {
+      "id": "16",
+      "type": "node",
+      "position": { "x": 900, "y": 50 },
+      "data": { "label": "16", "nodeNumber": 16, "elevation": 1298.6 }
+    },
+    {
+      "id": "17",
+      "type": "node",
+      "position": { "x": 1000, "y": 50 },
+      "data": { "label": "17", "nodeNumber": 17, "elevation": 1213.6 }
+    },
+    {
+      "id": "18",
+      "type": "node",
+      "position": { "x": 1100, "y": 50 },
+      "data": { "label": "18", "nodeNumber": 18, "elevation": 912.0 }
+    },
+    {
+      "id": "19",
+      "type": "node",
+      "position": { "x": 1200, "y": 50 },
+      "data": { "label": "19", "nodeNumber": 19, "elevation": 912.0 }
+    },
+    {
+      "id": "20",
+      "type": "flowBoundary",
+      "position": { "x": 1300, "y": 50 },
+      "data": { "label": "FB2", "nodeNumber": 20, "elevation": 908.2, "scheduleNumber": 2 }
+    }
+  ],
+  "edges": [
+    { "id": "e1-2", "source": "1", "target": "2", "type": "conduit", "data": { "label": "C1", "length": 52.5, "diameter": 38.89, "celerity": 4000, "friction": 0.0079, "cplus": 0.2, "cminus": 0.2, "numSegments": 1 } },
+    { "id": "e2-3", "source": "2", "target": "3", "type": "conduit", "data": { "label": "C2", "length": 59, "diameter": 59.0, "celerity": 4000, "friction": 0.0079, "cplus": 0.2, "cminus": 0.2, "numSegments": 1 } },
+    { "id": "e3-4", "source": "3", "target": "4", "type": "conduit", "data": { "label": "C3", "length": 404.1, "diameter": 38.76, "celerity": 4000, "friction": 0.0079, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e4-5", "source": "4", "target": "5", "type": "conduit", "data": { "label": "C3", "length": 404.1, "diameter": 38.76, "celerity": 4000, "friction": 0.0079, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e5-6", "source": "5", "target": "6", "type": "conduit", "data": { "label": "C3", "length": 404.1, "diameter": 38.76, "celerity": 4000, "friction": 0.0079, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e6-7", "source": "6", "target": "7", "type": "conduit", "data": { "label": "C3", "length": 404.1, "diameter": 38.76, "celerity": 4000, "friction": 0.0079, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e7-8", "source": "7", "target": "8", "type": "conduit", "data": { "label": "C3", "length": 404.1, "diameter": 38.76, "celerity": 4000, "friction": 0.0079, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e8-9", "source": "8", "target": "9", "type": "conduit", "data": { "label": "C4", "length": 78.6, "diameter": 78.6, "celerity": 4000, "friction": 0.0084, "cplus": 0.05, "cminus": 0.05, "numSegments": 1 } },
+    { "id": "e9-10", "source": "9", "target": "10", "type": "conduit", "data": { "label": "C5", "length": 177.4, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.05, "cminus": 0.05, "numSegments": 1 } },
+    { "id": "e10-11", "source": "10", "target": "11", "type": "conduit", "data": { "label": "C6", "length": 128.8, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.05, "cminus": 0.05, "numSegments": 1 } },
+    { "id": "e11-12", "source": "11", "target": "12", "type": "conduit", "data": { "label": "C7", "length": 370, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e12-13", "source": "12", "target": "13", "type": "conduit", "data": { "label": "C8", "length": 220.5, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.8, "cminus": 0.8, "numSegments": 1 } },
+    { "id": "e13-14", "source": "13", "target": "14", "type": "conduit", "data": { "label": "C9", "length": 21.3, "diameter": 15.74, "celerity": 3500, "friction": 0.0075, "cplus": 0.2, "cminus": 0.2, "numSegments": 1 } },
+    { "id": "e8-15", "source": "8", "target": "15", "type": "conduit", "data": { "label": "C4", "length": 78.6, "diameter": 78.6, "celerity": 4000, "friction": 0.0084, "cplus": 0.05, "cminus": 0.05, "numSegments": 1 } },
+    { "id": "e15-16", "source": "15", "target": "16", "type": "conduit", "data": { "label": "C5", "length": 177.4, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.05, "cminus": 0.05, "numSegments": 1 } },
+    { "id": "e16-17", "source": "16", "target": "17", "type": "conduit", "data": { "label": "C6", "length": 128.8, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.05, "cminus": 0.05, "numSegments": 1 } },
+    { "id": "e17-18", "source": "17", "target": "18", "type": "conduit", "data": { "label": "C7", "length": 370, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.1, "cminus": 0.1, "numSegments": 1 } },
+    { "id": "e18-19", "source": "18", "target": "19", "type": "conduit", "data": { "label": "C8", "length": 220.5, "diameter": 21.31, "celerity": 3500, "friction": 0.0067, "cplus": 0.8, "cminus": 0.8, "numSegments": 1 } },
+    { "id": "e19-20", "source": "19", "target": "20", "type": "conduit", "data": { "label": "C9", "length": 21.3, "diameter": 15.74, "celerity": 3500, "friction": 0.0075, "cplus": 0.2, "cminus": 0.2, "numSegments": 1 } }
+  ],
+  "computationalParams": {
+    "dtcomp": 0.1,
+    "dtout": 0.1,
+    "tmax": 500.0
+  },
+  "outputRequests": [
+    { "id": "req-1", "elementId": "1", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-8", "elementId": "8", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-10", "elementId": "10", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-11", "elementId": "11", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-13", "elementId": "13", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-16", "elementId": "16", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "HEAD"] },
+    { "id": "req-18", "elementId": "18", "elementType": "node", "requestType": "HISTORY", "variables": ["Q", "HEAD"] },
+    { "id": "req-s1", "elementId": "1", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-s8", "elementId": "8", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-s10", "elementId": "10", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-s11", "elementId": "11", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-s13", "elementId": "13", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "PIEZHEAD", "HEAD"] },
+    { "id": "req-s16", "elementId": "16", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "HEAD"] },
+    { "id": "req-s18", "elementId": "18", "elementType": "node", "requestType": "SPREADSHEET", "variables": ["Q", "HEAD"] }
+  ]
+}
