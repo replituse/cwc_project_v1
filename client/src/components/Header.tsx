@@ -282,13 +282,13 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                       <Button onClick={handleAddRequest}>Add Request</Button>
                       <Separator />
                       <div className="max-h-[200px] overflow-auto">
-                        <Label className="mb-2 block text-xs">Current Requests</Label>
-                            {outputRequests.map(req => {
+                        <Label className="mb-2 block text-xs">Current Requests ({requestType})</Label>
+                            {outputRequests.filter(req => req.requestType === requestType).map(req => {
                               const el = nodes.find(n => n.id === req.elementId) || edges.find(e => e.id === req.elementId);
                               const displayLabel = String(el?.data?.nodeNumber || el?.data?.label || req.elementId);
                               return (
                                 <div key={req.id} className="flex items-center justify-between text-xs py-1 border-b">
-                                  <span>[{req.requestType}] {displayLabel}: {req.variables.join(', ')}</span>
+                                  <span>{displayLabel}: {req.variables.join(', ')}</span>
                                   <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeOutputRequest(req.id)}>
                                     <Trash2 className="w-3 h-3" />
                                   </Button>
