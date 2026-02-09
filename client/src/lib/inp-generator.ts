@@ -177,21 +177,40 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
   addL('');
   addL('C OUTPUT REQUEST');
   addL('');
-  if (state.outputRequests.length > 0) {
-    addL('HISTORY');
-    state.outputRequests.forEach(req => {
-      const element = req.elementType === 'node' 
-        ? nodes.find(n => n.id === req.elementId)
-        : edges.find(e => e.id === req.elementId);
-      
-      const isSurgeTank = req.elementType === 'node' && element?.data?.type === 'surgeTank';
-      const label = isSurgeTank 
-        ? (element?.data?.label || element?.id || req.elementId)
-        : (element?.data?.nodeNumber || element?.data?.label || element?.id || req.elementId);
-      const typeStr = isSurgeTank ? 'ELEM' : 'NODE';
-      addL(` ${typeStr} ${label} ${req.variables.join(' ')}`);
+
+  const requestsByType = state.outputRequests.reduce((acc, req) => {
+    if (!acc[req.requestType]) acc[req.requestType] = [];
+    acc[req.requestType].push(req);
+    return acc;
+  }, {} as Record<string, typeof state.outputRequests>);
+
+  const requestTypes = Object.keys(requestsByType);
+
+  if (requestTypes.length > 0) {
+    requestTypes.forEach(type => {
+      addL(type);
+      requestsByType[type].forEach(req => {
+        const element = req.elementType === 'node' 
+          ? nodes.find(n => n.id === req.elementId)
+          : edges.find(e => e.id === req.elementId);
+        
+        const isSurgeTank = req.elementType === 'node' && element?.data?.type === 'surgeTank';
+        const label = isSurgeTank 
+          ? (element?.data?.label || element?.id || req.elementId)
+          : (element?.data?.nodeNumber || element?.data?.label || element?.id || req.elementId);
+        const typeStr = isSurgeTank ? 'ELEM' : 'NODE';
+        addL(` ${typeStr} ${label} ${req.variables.join(' ')}`);
+      });
+      addL(' FINISH');
+      addL('');
     });
-    addL(' FINISH');
+
+    if (requestTypes.length > 1) {
+      addL(' DISPLAY');
+      addL('  ALL');
+      addL(' FINISH');
+      addL('');
+    }
   } else {
     addL('HISTORY');
     addL(' NODE 2 Q HEAD');

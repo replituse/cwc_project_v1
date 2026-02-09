@@ -87,6 +87,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
   const [localParams, setLocalParams] = useState(computationalParams);
   const [selectedElementId, setSelectedElementId] = useState<string>("");
   const [selectedVars, setSelectedVars] = useState<string[]>([]);
+  const [requestType, setRequestType] = useState<'HISTORY' | 'PLOT'>('HISTORY');
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [tempProjectName, setTempProjectName] = useState(projectName);
 
@@ -103,6 +104,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
     addOutputRequest({
       elementId: selectedElementId,
       elementType: type,
+      requestType: requestType,
       variables: selectedVars
     });
     setSelectedElementId("");
@@ -230,6 +232,18 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
+                        <Label>Request Type</Label>
+                        <Select value={requestType} onValueChange={(v: 'HISTORY' | 'PLOT') => setRequestType(v)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="HISTORY">HISTORY</SelectItem>
+                            <SelectItem value="PLOT">PLOT</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
                         <Label>Select Element</Label>
                         <Select value={selectedElementId} onValueChange={setSelectedElementId}>
                           <SelectTrigger>
@@ -274,7 +288,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                               const displayLabel = String(el?.data?.nodeNumber || el?.data?.label || req.elementId);
                               return (
                                 <div key={req.id} className="flex items-center justify-between text-xs py-1 border-b">
-                                  <span>{displayLabel}: {req.variables.join(', ')}</span>
+                                  <span>[{req.requestType}] {displayLabel}: {req.variables.join(', ')}</span>
                                   <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeOutputRequest(req.id)}>
                                     <Trash2 className="w-3 h-3" />
                                   </Button>
