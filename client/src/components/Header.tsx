@@ -87,7 +87,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
   const [localParams, setLocalParams] = useState(computationalParams);
   const [selectedElementId, setSelectedElementId] = useState<string>("");
   const [selectedVars, setSelectedVars] = useState<string[]>([]);
-  const [requestType, setRequestType] = useState<'HISTORY' | 'PLOT'>('HISTORY');
+  const [requestType, setRequestType] = useState<'HISTORY' | 'PLOT' | 'SPREADSHEET'>('HISTORY');
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [tempProjectName, setTempProjectName] = useState(projectName);
 
@@ -118,7 +118,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
     toast({ title: "Project Renamed", description: `Project name changed to ${tempProjectName}` });
   };
 
-  const availableVars = ["Q", "HEAD", "ELEV", "VEL", "PRESS"];
+  const availableVars = ["Q", "HEAD", "ELEV", "VEL", "PRESS", "PIEZHEAD"];
 
   return (
     <div className="flex flex-col border-b bg-background">
@@ -233,13 +233,14 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
                         <Label>Request Type</Label>
-                        <Select value={requestType} onValueChange={(v: 'HISTORY' | 'PLOT') => setRequestType(v)}>
+                        <Select value={requestType} onValueChange={(v: 'HISTORY' | 'PLOT' | 'SPREADSHEET') => setRequestType(v)}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select type..." />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="HISTORY">HISTORY</SelectItem>
                             <SelectItem value="PLOT">PLOT</SelectItem>
+                            <SelectItem value="SPREADSHEET">SPREADSHEET</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

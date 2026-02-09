@@ -65,13 +65,14 @@ export function Toolbar({ onExport, onSave, onLoad }: { onExport: () => void, on
     addOutputRequest({
       elementId: selectedElementId,
       elementType: type,
+      requestType: 'HISTORY', // Default to HISTORY as this dialog doesn't have a selector yet
       variables: selectedVars
     });
     setSelectedElementId("");
     setSelectedVars([]);
   };
 
-  const availableVars = ["Q", "HEAD", "ELEV", "VEL", "PRESS"];
+  const availableVars = ["Q", "HEAD", "ELEV", "VEL", "PRESS", "PIEZHEAD"];
 
   const tools = [
     { label: 'Reservoir', icon: Cylinder, action: () => addNode('reservoir', { x: 100, y: 100 }), color: 'text-blue-600' },

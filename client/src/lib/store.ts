@@ -57,7 +57,7 @@ interface OutputRequest {
   id: string; // Internal ID for the request
   elementId: string; // ID of the node or edge
   elementType: 'node' | 'edge';
-  requestType: 'HISTORY' | 'PLOT';
+  requestType: 'HISTORY' | 'PLOT' | 'SPREADSHEET';
   variables: string[]; // e.g., ['Q', 'HEAD', 'ELEV']
 }
 
