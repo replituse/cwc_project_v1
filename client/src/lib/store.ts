@@ -287,9 +287,25 @@ export const useNetworkStore = create<NetworkState>((set, get) => ({
     );
     idCounter = maxId + 1;
     
+    // Flatten variableData for conduits if it exists
+    const processedEdges = edges.map(edge => {
+      if (edge.data?.variableData) {
+        const { variableData, ...restData } = edge.data;
+        return {
+          ...edge,
+          data: {
+            ...restData,
+            ...variableData,
+            variable: true // Ensure variable flag is set
+          }
+        };
+      }
+      return edge;
+    });
+    
     set({ 
       nodes, 
-      edges, 
+      edges: processedEdges, 
       computationalParams: params || get().computationalParams,
       outputRequests: requests || [],
       selectedElementId: null, 
