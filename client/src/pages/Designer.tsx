@@ -153,13 +153,14 @@ function DesignerInner() {
 
   const handleSave = () => {
     const data = { 
+      projectName,
       nodes, 
       edges,
       computationalParams,
       outputRequests
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    saveAs(blob, `whamo_project_${Date.now()}.json`);
+    saveAs(blob, `${projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'network'}_${Date.now()}.json`);
     toast({ title: "Project Saved", description: "Network topology saved to JSON." });
   };
 
@@ -180,16 +181,19 @@ function DesignerInner() {
         if (fileName.endsWith('.json')) {
           const json = JSON.parse(content);
           if (json.nodes && json.edges) {
-            loadNetwork(json.nodes, json.edges, json.computationalParams, json.outputRequests);
-            toast({ title: "Project Loaded", description: "Network topology restored from JSON." });
+            // Use project name from file or fallback to filename
+            const loadedProjectName = json.projectName || file.name.replace(/\.json$/i, '');
+            loadNetwork(json.nodes, json.edges, json.computationalParams, json.outputRequests, loadedProjectName);
+            toast({ title: "Project Loaded", description: `Network topology "${loadedProjectName}" restored from JSON.` });
           } else {
             throw new Error("Invalid JSON format");
           }
         } else if (fileName.endsWith('.inp')) {
           const { nodes, edges } = parseInpFile(content);
           if (nodes.length > 0) {
-            loadNetwork(nodes, edges);
-            toast({ title: "Project Loaded", description: "Network topology restored from .inp file." });
+            const loadedProjectName = file.name.replace(/\.inp$/i, '');
+            loadNetwork(nodes, edges, undefined, undefined, loadedProjectName);
+            toast({ title: "Project Loaded", description: `Network topology "${loadedProjectName}" restored from .inp file.` });
           } else {
             throw new Error("No valid network elements found in .inp file");
           }

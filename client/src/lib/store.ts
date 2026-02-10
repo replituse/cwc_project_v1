@@ -279,7 +279,7 @@ export const useNetworkStore = create<NetworkState>((set, get) => ({
     set({ selectedElementId: id, selectedElementType: type });
   },
 
-  loadNetwork: (nodes, edges, params, requests) => {
+  loadNetwork: (nodes, edges, params, requests, projectName) => {
     const maxId = Math.max(
       ...nodes.map(n => parseInt(n.id) || 0),
       ...edges.map(e => parseInt(e.id) || 0),
@@ -308,6 +308,7 @@ export const useNetworkStore = create<NetworkState>((set, get) => ({
       edges: processedEdges, 
       computationalParams: params || get().computationalParams,
       outputRequests: requests || [],
+      projectName: projectName || get().projectName,
       selectedElementId: null, 
       selectedElementType: null 
     });
@@ -315,7 +316,14 @@ export const useNetworkStore = create<NetworkState>((set, get) => ({
 
   clearNetwork: () => {
     get().saveToHistory();
-    set({ nodes: [], edges: [], selectedElementId: null, selectedElementType: null, outputRequests: [] });
+    set({ 
+      nodes: [], 
+      edges: [], 
+      selectedElementId: null, 
+      selectedElementType: null, 
+      outputRequests: [],
+      projectName: "Untitled Network" 
+    });
     idCounter = 1;
   },
 

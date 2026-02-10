@@ -138,7 +138,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
             <MenubarMenu>
               <MenubarTrigger className="text-[14px] font-normal h-7 text-black hover:bg-[#f1f3f4] data-[state=open]:bg-[#f1f3f4] px-2 rounded cursor-default">File</MenubarTrigger>
               <MenubarContent>
-                <MenubarItem onClick={clearNetwork} className="gap-2">
+                <MenubarItem onClick={() => { clearNetwork(); }} className="gap-2">
                   <FilePlus className="w-4 h-4" /> New
                 </MenubarItem>
                 <MenubarItem onClick={onLoad} className="gap-2">
@@ -155,7 +155,7 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                   <DownloadCloud className="w-4 h-4" /> Download (.inp)
                 </MenubarItem>
                 <MenubarSeparator />
-                <MenubarItem onClick={clearNetwork} className="gap-2 text-destructive focus:text-destructive">
+                <MenubarItem onClick={() => { clearNetwork(); }} className="gap-2 text-destructive focus:text-destructive">
                   <Eraser className="w-4 h-4" /> Clear Canvas
                 </MenubarItem>
                 <MenubarItem onClick={() => { clearNetwork(); setProjectName("Untitled Network"); }} className="gap-2 text-destructive focus:text-destructive">
