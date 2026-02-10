@@ -141,9 +141,27 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
 
       if (inElem !== outElem) {
         // RULE 3B: SKIP - Specific Transition Patterns
-        // Case 1: C8 -> C9 Transitions
-        if (inElem === 'C8' && outElem === 'C9') {
-          return;
+        
+        // Dynamic Terminal Transition Check: 
+        // Identify the last transition before a special element (FB, etc.)
+        // In the reference files, this is C8 -> C9 skip before FB1/FB2.
+        // We can generalize this: if outgoing leads directly to a terminal node
+        // and that element is the last one in a sequence.
+        
+        const isTerminalTransition = connections.outgoing.every(outE => {
+          const link = elementLinks.find(l => l.from === nodeId && l.id === outE);
+          if (!link) return false;
+          const nextNodeConnections = nodeConnections[link.to];
+          return nextNodeConnections && nextNodeConnections.outgoing.length === 0 && nodeIdsWithSpecialElements.has(link.to);
+        });
+
+        // The specific C8 -> C9 skip pattern
+        if (inElem.match(/^C\d+$/) && outElem.match(/^C\d+$/)) {
+          const inNum = parseInt(inElem.substring(1));
+          const outNum = parseInt(outElem.substring(1));
+          if (outNum === inNum + 1 && isTerminalTransition) {
+            return;
+          }
         }
 
         // Case 2: Parallel Branches
