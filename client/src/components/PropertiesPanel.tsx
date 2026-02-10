@@ -6,6 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2 } from 'lucide-react';
 
 export function PropertiesPanel() {
@@ -244,6 +245,56 @@ export function PropertiesPanel() {
 
           {!isNode && (element.data?.type === 'conduit' || !element.data?.type) && (
             <>
+              <div className="flex items-center space-x-2 mb-4">
+                <Checkbox 
+                  id="variable" 
+                  checked={element.data?.variable || false} 
+                  onCheckedChange={(checked) => handleChange('variable', !!checked)}
+                />
+                <Label htmlFor="variable" className="font-semibold text-primary">VARIABLE (optional)</Label>
+              </div>
+
+              {element.data?.variable && (
+                <div className="grid grid-cols-2 gap-4 p-3 bg-muted/30 rounded-md border border-border/50 mb-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="distance">DISTANCE</Label>
+                    <Input 
+                      id="distance" 
+                      type="number" 
+                      value={element.data?.distance || 0} 
+                      onChange={(e) => handleChange('distance', e.target.value)} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="area">AREA</Label>
+                    <Input 
+                      id="area" 
+                      type="number" 
+                      value={element.data?.area || 0} 
+                      onChange={(e) => handleChange('area', e.target.value)} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="d">D</Label>
+                    <Input 
+                      id="d" 
+                      type="number" 
+                      value={element.data?.d || 0} 
+                      onChange={(e) => handleChange('d', e.target.value)} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="a">A</Label>
+                    <Input 
+                      id="a" 
+                      type="number" 
+                      value={element.data?.a || 0} 
+                      onChange={(e) => handleChange('a', e.target.value)} 
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="length">Length (m)</Label>
@@ -254,15 +305,17 @@ export function PropertiesPanel() {
                     onChange={(e) => handleChange('length', e.target.value)} 
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="diam">Diameter (m)</Label>
-                  <Input 
-                    id="diam" 
-                    type="number" 
-                    value={element.data?.diameter || 0} 
-                    onChange={(e) => handleChange('diameter', e.target.value)} 
-                  />
-                </div>
+                {!element.data?.variable && (
+                  <div className="space-y-2">
+                    <Label htmlFor="diam">Diameter (m)</Label>
+                    <Input 
+                      id="diam" 
+                      type="number" 
+                      value={element.data?.diameter || 0} 
+                      onChange={(e) => handleChange('diameter', e.target.value)} 
+                    />
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

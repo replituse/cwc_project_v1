@@ -76,6 +76,12 @@ export const conduitPropsSchema = z.object({
   cplus: z.number().optional(),
   cminus: z.number().optional(),
   comment: z.string().optional(),
+  // VARIABLE section
+  variable: z.boolean().optional(),
+  distance: z.number().optional(),
+  area: z.number().optional(),
+  d: z.number().optional(),
+  a: z.number().optional(),
 });
 
 export const dummyPipePropsSchema = z.object({

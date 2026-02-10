@@ -103,20 +103,35 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
     const d = e.data;
     if (!d) return;
     addComment(d.comment);
-    let line = `CONDUIT ID ${d.label || e.id} LENG ${d.length} DIAM ${d.diameter} CELE ${d.celerity} FRIC ${d.friction} `;
-    if (d.cplus !== undefined || d.cminus !== undefined) {
-      addL(line);
-      let loss = 'ADDEDLOSS ';
-      if (d.cplus !== undefined) loss += `CPLUS ${d.cplus} `;
-      if (d.cminus !== undefined) loss += `CMINUS ${d.cminus} `;
-      if (d.numSegments !== undefined) loss += `NUMSEG ${d.numSegments} `;
-      loss += 'FINISH ';
-      addL(loss);
-    } else {
-      if (d.numSegments !== undefined) line += `NUMSEG ${d.numSegments} `;
-      line += 'FINISH ';
-      addL(line);
+    addL('CONDUIT');
+    addL(` ID ${d.label || e.id}`);
+    
+    if (d.variable) {
+      addL(' VARIABLE');
+      if (d.distance !== undefined) addL(` DISTANCE ${d.distance}`);
+      if (d.area !== undefined) addL(` AREA ${d.area}`);
+      if (d.d !== undefined) addL(` D ${d.d}`);
+      if (d.a !== undefined) addL(` A ${d.a}`);
     }
+
+    addL(` LENGTH ${d.length}`);
+    if (!d.variable) {
+      addL(` DIAM ${d.diameter}`);
+    }
+    addL(` CELERITY ${d.celerity}`);
+    addL(` FRICTION ${d.friction}`);
+    
+    if (d.cplus !== undefined || d.cminus !== undefined) {
+      addL(' ADDEDLOSS');
+      if (d.cplus !== undefined) addL(`     CPLUS ${d.cplus.toFixed(2)}`);
+      if (d.cminus !== undefined) addL(`     CMINUS ${d.cminus.toFixed(2)}`);
+    }
+    
+    if (d.numSegments !== undefined) {
+      addL(` NUMSEG ${d.numSegments}`);
+    }
+    addL('FINISH');
+    addL('');
   });
 
   edges.filter(e => e.data?.type === 'dummy').forEach(e => {

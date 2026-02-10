@@ -42,6 +42,11 @@ interface EdgeData extends Record<string, unknown> {
   cplus?: number;
   cminus?: number;
   comment?: string;
+  variable?: boolean;
+  distance?: number;
+  area?: number;
+  d?: number;
+  a?: number;
 }
 
 export type WhamoNode = Node<NodeData>;
