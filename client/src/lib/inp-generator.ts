@@ -86,57 +86,109 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
 
   // NODE Selection Algorithm
   const nodesToInclude = new Set<string>();
-  
-  // 1. Special elements nodes are always included
-  nodeIdsWithSpecialElements.forEach(id => nodesToInclude.add(id));
 
   // Parse connectivity to identify chains and transitions
-  const elementLinks: { id: string, from: string, to: string }[] = [];
+  const elementLinks: { id: string, from: string, to: string, type?: string }[] = [];
+  const nodeConnections: Record<string, { incoming: string[], outgoing: string[] }> = {};
+
   connectivityLines.forEach(line => {
     const linkMatch = line.match(/^ELEM\s+(\S+)\s+LINK\s+(\S+)\s+(\S+)/);
     if (linkMatch) {
-      elementLinks.push({ id: linkMatch[1], from: linkMatch[2], to: linkMatch[3] });
+      const elementId = linkMatch[1];
+      const from = linkMatch[2];
+      const to = linkMatch[3];
+
+      elementLinks.push({ id: elementId, from, to });
+
+      if (!nodeConnections[from]) nodeConnections[from] = { incoming: [], outgoing: [] };
+      if (!nodeConnections[to]) nodeConnections[to] = { incoming: [], outgoing: [] };
+
+      nodeConnections[from].outgoing.push(elementId);
+      nodeConnections[to].incoming.push(elementId);
     }
   });
 
-  elementLinks.forEach((link, index) => {
-    const prevLink = elementLinks[index - 1];
-    const nextLink = elementLinks[index + 1];
+  // Keep track of branch patterns to identify parallel branches
+  // A pattern is defined by the sequence of element IDs from a junction to a terminal node
+  const branchPatterns = new Set<string>();
 
-    const isStartOfChain = !prevLink || prevLink.id !== link.id;
-    const isEndOfChain = !nextLink || nextLink.id !== link.id;
+  const allNodeIds = Array.from(new Set([
+    ...nodes.map(n => n.data.nodeNumber?.toString() || n.id),
+    ...Array.from(nodeIdsWithSpecialElements)
+  ]));
 
-    // a) Multi-link chain logic
-    if (!isStartOfChain && !isEndOfChain) {
-      // Intermediate node in a multi-link chain - SKIP
+  allNodeIds.forEach(nodeId => {
+    const connections = nodeConnections[nodeId] || { incoming: [], outgoing: [] };
+    const hasSpecial = nodeIdsWithSpecialElements.has(nodeId);
+
+    // RULE 1: ALWAYS INCLUDE - Nodes with Special Elements
+    if (hasSpecial) {
+      nodesToInclude.add(nodeId);
       return;
     }
 
-    if (isStartOfChain) {
-      nodesToInclude.add(link.from);
+    // RULE 2: ALWAYS SKIP - Intermediate Nodes in Multi-Link Chains
+    // Skip if SAME element ID appears in both incoming and outgoing
+    if (connections.incoming.length === 1 && connections.outgoing.length === 1 &&
+        connections.incoming[0] === connections.outgoing[0]) {
+      return;
     }
-    
-    // b) Single-link or End-of-chain logic
-    // If it's a single link (isStartOfChain && isEndOfChain)
-    // OR if it's the end of a chain
-    
-    if (isEndOfChain) {
-      // Rule 2b: SKIP the "to" node if:
-      // * The next element is also a single-link with different ID
-      // * AND the "to" node has NO special element AT it
-      // * AND it's NOT immediately after a node with special element AT it
-      
-      const nextIsSingleDifferent = nextLink && 
-        (!elementLinks[index + 2] || elementLinks[index + 2].id !== nextLink.id) &&
-        nextLink.id !== link.id;
 
-      const hasSpecialAtTo = nodeIdsWithSpecialElements.has(link.to);
-      const isImmediatelyAfterSpecial = nodeIdsWithSpecialElements.has(link.from);
+    // RULE 3: SELECTIVE INCLUSION - Transition Nodes
+    if (connections.incoming.length > 0 && connections.outgoing.length > 0) {
+      const inElem = connections.incoming[0];
+      const outElem = connections.outgoing[0];
 
-      if (nextIsSingleDifferent && !hasSpecialAtTo && !isImmediatelyAfterSpecial) {
-        // Skip according to logic
-      } else {
-        nodesToInclude.add(link.to);
+      if (inElem !== outElem) {
+        // RULE 3B: SKIP - Specific Transition Patterns
+        // Case 1: C8 -> C9 Transitions
+        if (inElem === 'C8' && outElem === 'C9') {
+          return;
+        }
+
+        // Case 2: Parallel Branches
+        // Check if this node is the first node after a junction
+        const incomingEdges = edges.filter(e => {
+          const toNode = nodes.find(n => n.id === e.target);
+          return (toNode?.data.nodeNumber?.toString() || toNode?.id) === nodeId;
+        });
+
+        const isAfterJunction = incomingEdges.some(e => {
+          const fromNode = nodes.find(n => n.id === e.source);
+          const fromId = fromNode?.data.nodeNumber?.toString() || fromNode?.id;
+          return fromId && nodeIdsWithSpecialElements.has(fromId) && 
+                 nodeConnections[fromId]?.outgoing.length > 1;
+        });
+
+        if (isAfterJunction) {
+          // Find the branch sequence starting from this node
+          let currentId = nodeId;
+          let pattern = "";
+          const visitedInPattern = new Set<string>();
+          
+          while (currentId && !visitedInPattern.has(currentId)) {
+            visitedInPattern.add(currentId);
+            const currConns = nodeConnections[currentId];
+            if (!currConns || currConns.outgoing.length !== 1) break;
+            const elem = currConns.outgoing[0];
+            pattern += (pattern ? "->" : "") + elem;
+            
+            const link = elementLinks.find(l => l.from === currentId && l.id === elem);
+            if (!link) break;
+            currentId = link.to;
+          }
+
+          if (pattern) {
+            if (branchPatterns.has(pattern)) {
+              // SKIP - Duplicate parallel branch
+              return;
+            }
+            branchPatterns.add(pattern);
+          }
+        }
+
+        // If it passed all skip rules, include it
+        nodesToInclude.add(nodeId);
       }
     }
   });
