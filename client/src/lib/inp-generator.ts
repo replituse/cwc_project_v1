@@ -90,6 +90,8 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
   addL('');
 
   // Properties Section
+  const exportedConduitLabels = new Set<string>();
+
   nodes.filter(n => n.type === 'reservoir').forEach(n => {
     addComment(n.data.comment);
     addL('RESERVOIR');
@@ -102,9 +104,14 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
   edges.filter(e => e.data?.type === 'conduit').forEach(e => {
     const d = e.data;
     if (!d) return;
+    
+    const label = d.label || e.id;
+    if (exportedConduitLabels.has(label)) return;
+    exportedConduitLabels.add(label);
+
     addComment(d.comment);
     addL('CONDUIT');
-    addL(` ID ${d.label || e.id}`);
+    addL(` ID ${label}`);
     
     if (d.variable) {
       addL(' VARIABLE');
