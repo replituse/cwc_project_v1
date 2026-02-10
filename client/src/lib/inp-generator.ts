@@ -106,19 +106,38 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
     const isStartOfChain = !prevLink || prevLink.id !== link.id;
     const isEndOfChain = !nextLink || nextLink.id !== link.id;
 
-    // a) Multi-link chain or single-link
+    // a) Multi-link chain logic
+    if (!isStartOfChain && !isEndOfChain) {
+      // Intermediate node in a multi-link chain - SKIP
+      return;
+    }
+
     if (isStartOfChain) {
       nodesToInclude.add(link.from);
     }
+    
+    // b) Single-link or End-of-chain logic
+    // If it's a single link (isStartOfChain && isEndOfChain)
+    // OR if it's the end of a chain
+    
     if (isEndOfChain) {
-      nodesToInclude.add(link.to);
-    }
+      // Rule 2b: SKIP the "to" node if:
+      // * The next element is also a single-link with different ID
+      // * AND the "to" node has NO special element AT it
+      // * AND it's NOT immediately after a node with special element AT it
+      
+      const nextIsSingleDifferent = nextLink && 
+        (!elementLinks[index + 2] || elementLinks[index + 2].id !== nextLink.id) &&
+        nextLink.id !== link.id;
 
-    // b) Single-link logic (additional rules from algorithm)
-    if (isStartOfChain && isEndOfChain) {
-      // It's already included via the above logic, but let's double check special cases
-      const isAfterSpecial = index > 0 && nodeIdsWithSpecialElements.has(link.from);
-      if (isAfterSpecial) nodesToInclude.add(link.from);
+      const hasSpecialAtTo = nodeIdsWithSpecialElements.has(link.to);
+      const isImmediatelyAfterSpecial = nodeIdsWithSpecialElements.has(link.from);
+
+      if (nextIsSingleDifferent && !hasSpecialAtTo && !isImmediatelyAfterSpecial) {
+        // Skip according to logic
+      } else {
+        nodesToInclude.add(link.to);
+      }
     }
   });
 
