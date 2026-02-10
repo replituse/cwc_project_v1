@@ -24,6 +24,8 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
   // Connectivity section
   const visitedNodes = new Set<string>();
   const visitedEdges = new Set<string>();
+  const connectivityLines: string[] = [];
+  const nodeIdsWithSpecialElements = new Set<string>();
 
   function traverse(nodeId: string) {
     if (visitedNodes.has(nodeId)) return;
@@ -32,11 +34,12 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return;
 
+    const actualNodeId = node.data.nodeNumber?.toString() || node.id;
+
     // Elements AT this node
-    if (node.type === 'reservoir') {
-      addL(`ELEM ${node.data.label} AT ${node.data.nodeNumber || node.id}`);
-    } else if (node.type === 'surgeTank' || node.type === 'flowBoundary') {
-      addL(`ELEM ${node.data.label} AT ${node.data.nodeNumber || node.id}`);
+    if (node.type === 'reservoir' || node.type === 'surgeTank' || node.type === 'flowBoundary') {
+      connectivityLines.push(`ELEM ${node.data.label} AT ${actualNodeId}`);
+      nodeIdsWithSpecialElements.add(actualNodeId);
     }
 
     // Outgoing edges
@@ -44,9 +47,10 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
     
     if (outgoingEdges.length > 0) {
       if (node.type === 'junction' || outgoingEdges.length > 1) {
-        addL('');
-        addL(`JUNCTION AT ${node.data.nodeNumber || node.id}`);
-        addL('');
+        connectivityLines.push('');
+        connectivityLines.push(`JUNCTION AT ${actualNodeId}`);
+        connectivityLines.push('');
+        nodeIdsWithSpecialElements.add(actualNodeId);
       }
 
       outgoingEdges.forEach(edge => {
@@ -54,10 +58,10 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
         visitedEdges.add(edge.id);
         
         const toNode = nodes.find(n => n.id === edge.target);
-        const toId = toNode?.data.nodeNumber || toNode?.id || edge.target;
-        const fromId = node.data.nodeNumber || node.id;
+        const toId = toNode?.data.nodeNumber?.toString() || toNode?.id || edge.target;
+        const fromId = actualNodeId;
 
-        addL(`ELEM ${edge.data?.label || edge.id} LINK ${fromId} ${toId}`);
+        connectivityLines.push(`ELEM ${edge.data?.label || edge.id} LINK ${fromId} ${toId}`);
         traverse(edge.target);
       });
     }
@@ -71,15 +75,66 @@ export function generateInpFile(nodes: WhamoNode[], edges: WhamoEdge[]) {
   nodes.forEach(n => {
     if (!visitedNodes.has(n.id)) {
       if (n.type === 'surgeTank' || n.type === 'flowBoundary') {
-        addL(`ELEM ${n.data.label} AT ${n.data.nodeNumber || n.id}`);
+        const actualNodeId = n.data.nodeNumber?.toString() || n.id;
+        connectivityLines.push(`ELEM ${n.data.label} AT ${actualNodeId}`);
+        nodeIdsWithSpecialElements.add(actualNodeId);
       }
     }
   });
 
+  connectivityLines.forEach(line => addL(line));
+
+  // NODE Selection Algorithm
+  const nodesToInclude = new Set<string>();
+  
+  // 1. Special elements nodes are always included
+  nodeIdsWithSpecialElements.forEach(id => nodesToInclude.add(id));
+
+  // Parse connectivity to identify chains and transitions
+  const elementLinks: { id: string, from: string, to: string }[] = [];
+  connectivityLines.forEach(line => {
+    const linkMatch = line.match(/^ELEM\s+(\S+)\s+LINK\s+(\S+)\s+(\S+)/);
+    if (linkMatch) {
+      elementLinks.push({ id: linkMatch[1], from: linkMatch[2], to: linkMatch[3] });
+    }
+  });
+
+  elementLinks.forEach((link, index) => {
+    const prevLink = elementLinks[index - 1];
+    const nextLink = elementLinks[index + 1];
+
+    const isStartOfChain = !prevLink || prevLink.id !== link.id;
+    const isEndOfChain = !nextLink || nextLink.id !== link.id;
+
+    // a) Multi-link chain or single-link
+    if (isStartOfChain) {
+      nodesToInclude.add(link.from);
+    }
+    if (isEndOfChain) {
+      nodesToInclude.add(link.to);
+    }
+
+    // b) Single-link logic (additional rules from algorithm)
+    if (isStartOfChain && isEndOfChain) {
+      // It's already included via the above logic, but let's double check special cases
+      const isAfterSpecial = index > 0 && nodeIdsWithSpecialElements.has(link.from);
+      if (isAfterSpecial) nodesToInclude.add(link.from);
+    }
+  });
+
   addL('');
-  nodes.forEach(n => {
-    if (n.data.elevation !== undefined) {
-      addL(`NODE ${n.data.nodeNumber || n.id} ELEV ${n.data.elevation} `);
+  const sortedNodeIds = Array.from(nodesToInclude).sort((a, b) => {
+    const numA = parseInt(a);
+    const numB = parseInt(b);
+    if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+    return a.localeCompare(b);
+  });
+
+  sortedNodeIds.forEach(id => {
+    const node = nodes.find(n => (n.data.nodeNumber?.toString() || n.id) === id);
+    if (node && node.data.elevation !== undefined) {
+      const elev = typeof node.data.elevation === 'number' ? node.data.elevation.toFixed(1) : parseFloat(node.data.elevation).toFixed(1);
+      addL(`    NODE ${id} ELEV ${elev}`);
     }
   });
 
