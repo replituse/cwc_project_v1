@@ -33,19 +33,41 @@ export async function registerRoutes(
     const safeProjectName = (projectName || "project").replace(/[^a-z0-9]/gi, "_").toLowerCase();
     const inpPath = path.join(tempDir, `${safeProjectName}_${timestamp}.inp`);
     const outPath = path.join(tempDir, `${safeProjectName}_${timestamp}.out`);
-    const exePath = path.join(process.cwd(), "attached_assets", "WHAMO_1770789617324.EXE");
+    const exePath = path.join(process.cwd(), "attached_assets", "WHAMO_1770791542355.EXE");
 
     try {
       await fs.writeFile(inpPath, inpContent);
 
-      // WHAMO execution disabled due to environment compatibility issues.
-      // Returning a mock result or error message that explains the situation.
-      console.warn("WHAMO.EXE execution is currently disabled in this environment.");
+      // We need to execute the WHAMO.EXE which is a Windows executable.
+      // In a Linux environment, we typically use 'wine' to run Windows executables.
+      // Let's attempt to run it using wine.
       
-      return res.status(503).json({ 
-        message: "Analysis engine (WHAMO.EXE) is not compatible with the current environment.",
-        details: "The legacy 16-bit/32-bit executable requires a specific environment not available in this workspace."
-      });
+      const command = `wine "${exePath}" "${inpPath}" "${outPath}"`;
+      console.log(`Executing command: ${command}`);
+      
+      try {
+        await execPromise(command);
+        
+        // Check if output file exists
+        const outContent = await fs.readFile(outPath, "utf-8");
+        return res.json({ 
+          message: "Generation successful", 
+          outContent,
+          projectName: safeProjectName
+        });
+      } catch (execError: any) {
+        console.error("WHAMO execution failed:", execError);
+        
+        // Fallback or detailed error if wine is not available
+        if (execError.message.includes("wine: not found")) {
+           return res.status(503).json({ 
+            message: "Analysis engine (WHAMO.EXE) requires 'wine' to run in this environment.",
+            details: "Please ensure 'wine' is installed in the system to support Windows executable execution."
+          });
+        }
+
+        throw execError;
+      }
     } catch (error: any) {
       console.error("Generate .OUT error:", error);
       res.status(500).json({ message: "Error processing .OUT generation", error: error.message });
