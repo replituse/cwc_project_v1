@@ -23,7 +23,8 @@ import {
   Circle,
   GitCommitHorizontal,
   ArrowRightCircle,
-  ListVideo
+  ListVideo,
+  FileText
 } from 'lucide-react';
 import {
   Menubar,
@@ -120,6 +121,43 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
 
   const availableVars = ["Q", "HEAD", "ELEV", "VEL", "PRESS", "PIEZHEAD"];
 
+  const handleGenerateOut = async () => {
+    try {
+      // First generate the INP content (using existing logic, assuming onExport gives it or we can get it)
+      // Since onExport typically triggers a download, we might need a way to get the content directly.
+      // For now, I'll assume we can use a helper or the store.
+      const { getInpContent } = await import('@/lib/inp-generator');
+      const inpContent = getInpContent(nodes, edges);
+
+      const response = await fetch('/api/generate-out', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inpContent, projectName })
+      });
+
+      if (!response.ok) throw new Error('Failed to generate .OUT');
+
+      const data = await response.json();
+      const blob = new Blob([data.content], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({ title: "Success", description: ".OUT file generated and downloaded." });
+    } catch (error: any) {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to generate .OUT file", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col border-b bg-background">
       {/* Top Row: Icon and Project Name */}
@@ -153,6 +191,9 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
                 </MenubarItem>
                 <MenubarItem onClick={onExport} className="gap-2">
                   <DownloadCloud className="w-4 h-4" /> Download (.inp)
+                </MenubarItem>
+                <MenubarItem onClick={handleGenerateOut} className="gap-2">
+                  <FileText className="w-4 h-4" /> Download (.out)
                 </MenubarItem>
                 <MenubarSeparator />
                 <MenubarItem onClick={() => { clearNetwork(); }} className="gap-2 text-destructive focus:text-destructive">
@@ -374,6 +415,15 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
 
 
         <div className="ml-auto flex items-center gap-2 pr-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleGenerateOut}
+            className="h-9 px-6 rounded-full border-[#1a73e8] text-[#1a73e8] hover:bg-[#1a73e8]/10 font-medium shadow-sm transition-all"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Generate .OUT
+          </Button>
           <Button 
             variant="default" 
             size="sm" 
