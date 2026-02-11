@@ -66,7 +66,8 @@ function DesignerInner() {
     selectedElementId,
     selectedElementType,
     isLocked,
-    toggleLock
+    toggleLock,
+    projectName
   } = useNetworkStore();
 
   useEffect(() => {
@@ -151,7 +152,7 @@ function DesignerInner() {
     }
   }, [selectElement]);
 
-  const handleSave = () => {
+    const handleSave = () => {
     const data = { 
       projectName,
       nodes, 
@@ -160,7 +161,8 @@ function DesignerInner() {
       outputRequests
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    saveAs(blob, `${projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'network'}_${Date.now()}.json`);
+    const name = (typeof projectName === 'string' ? projectName : 'network').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    saveAs(blob, `${name}_${Date.now()}.json`);
     toast({ title: "Project Saved", description: "Network topology saved to JSON." });
   };
 
@@ -211,7 +213,7 @@ function DesignerInner() {
 
   const handleGenerateInp = () => {
     try {
-      generateInpFile(nodes, edges);
+      generateInpFile(nodes as any, edges as any);
       toast({ title: "INP Generated", description: "WHAMO input file downloaded successfully." });
     } catch (err) {
       toast({ variant: "destructive", title: "Generation Failed", description: "Could not generate .inp file. Check connections." });

@@ -135,9 +135,18 @@ export function Header({ onExport, onSave, onLoad }: HeaderProps) {
         body: JSON.stringify({ inpContent, projectName })
       });
 
-      if (!response.ok) throw new Error('Failed to generate .OUT');
-
       const data = await response.json();
+
+      if (response.status === 503) {
+        toast({ 
+          title: "Analysis Unavailable", 
+          description: data.message + " " + (data.details || ""), 
+          variant: "destructive" 
+        });
+        return;
+      }
+
+      if (!response.ok) throw new Error(data.message || 'Failed to generate .OUT');
       const blob = new Blob([data.content], { type: 'text/plain' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');

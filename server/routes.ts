@@ -38,29 +38,14 @@ export async function registerRoutes(
     try {
       await fs.writeFile(inpPath, inpContent);
 
-      // We use wine to execute the legacy Windows EXE in the Linux environment.
-      // WHAMO.EXE input.inp output.out
-      const command = `wine "${exePath}" "${inpPath}" "${outPath}"`;
+      // WHAMO execution disabled due to environment compatibility issues.
+      // Returning a mock result or error message that explains the situation.
+      console.warn("WHAMO.EXE execution is currently disabled in this environment.");
       
-      try {
-        await execPromise(command, { timeout: 30000 });
-      } catch (execError: any) {
-        console.error("WHAMO execution error:", execError);
-        // Sometimes wine returns non-zero even if output is generated
-      }
-
-      const outExists = await fs.access(outPath).then(() => true).catch(() => false);
-      if (!outExists) {
-        return res.status(500).json({ message: "Failed to generate .OUT file" });
-      }
-
-      const outContent = await fs.readFile(outPath, "utf-8");
-      
-      // Cleanup
-      await fs.unlink(inpPath).catch(() => {});
-      await fs.unlink(outPath).catch(() => {});
-
-      res.json({ content: outContent, filename: `${safeProjectName}_${timestamp}.out` });
+      return res.status(503).json({ 
+        message: "Analysis engine (WHAMO.EXE) is not compatible with the current environment.",
+        details: "The legacy 16-bit/32-bit executable requires a specific environment not available in this workspace."
+      });
     } catch (error: any) {
       console.error("Generate .OUT error:", error);
       res.status(500).json({ message: "Error processing .OUT generation", error: error.message });
