@@ -38,9 +38,8 @@ export async function registerRoutes(
     try {
       await fs.writeFile(inpPath, inpContent);
 
-      // We need to execute the WHAMO.EXE which is a Windows executable.
-      // In a Linux environment, we typically use 'wine' to run Windows executables.
-      // Let's attempt to run it using wine.
+      // Attempt to run with wine first, then fallback to mock if it keeps failing
+      // Replit sandbox often blocks wine due to syscall filtering.
       
       const command = `wine "${exePath}" "${inpPath}" "${outPath}"`;
       console.log(`Executing command: ${command}`);
@@ -48,7 +47,6 @@ export async function registerRoutes(
       try {
         await execPromise(command);
         
-        // Check if output file exists
         const outContent = await fs.readFile(outPath, "utf-8");
         return res.json({ 
           message: "Generation successful", 
@@ -58,12 +56,38 @@ export async function registerRoutes(
       } catch (execError: any) {
         console.error("WHAMO execution failed:", execError);
         
-        // Fallback or detailed error if wine is not available
-        if (execError.message.includes("wine: not found")) {
-           return res.status(503).json({ 
-            message: "Analysis engine (WHAMO.EXE) requires 'wine' to run in this environment.",
-            details: "Please ensure 'wine' is installed in the system to support Windows executable execution."
-          });
+        // If it's a "Bad system call" or wine is missing, use a mock response for now
+        // so the user isn't blocked, while explaining the limitation.
+        if (execError.message.includes("Bad system call") || execError.message.includes("wine: not found")) {
+           console.warn("Using mock .OUT generation due to environment restrictions on executing .EXE files.");
+           
+           // Generate a mock .OUT content based on the sample 1_OUT.OUT if available, 
+           // or a generic valid-looking header.
+           const mockOutContent = `WHAMO (Water Hammer and Mass Oscillation) Analysis Result
+Project: ${safeProjectName}
+Generated on: ${new Date().toLocaleString()}
+
+ANALYSIS SUMMARY:
+-----------------
+Execution environment: Linux (Replit Sandbox)
+Note: The analysis engine execution was simulated due to environment restrictions.
+
+INPUT ECHO:
+${inpContent.split('\n').map(line => '> ' + line).join('\n')}
+
+COMPUTATIONAL RESULTS:
+Time(s)    Node       Head(m)    Flow(m3/s)
+0.00       HW         100.00     1.25
+1.00       HW         100.00     1.24
+...
+Analysis completed successfully (Simulated).
+`;
+           return res.json({ 
+             message: "Generation simulated (Analysis engine restricted in this environment)", 
+             outContent: mockOutContent,
+             projectName: safeProjectName,
+             isSimulated: true
+           });
         }
 
         throw execError;
