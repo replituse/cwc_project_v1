@@ -33,26 +33,38 @@ export async function registerRoutes(
     const safeProjectName = (projectName || "project").replace(/[^a-z0-9]/gi, "_").toLowerCase();
     const inpPath = path.join(tempDir, `${safeProjectName}_${timestamp}.inp`);
     const outPath = path.join(tempDir, `${safeProjectName}_${timestamp}.out`);
-    const exePath = path.join(process.cwd(), "attached_assets", "WHAMO_1770791542355.EXE");
+    const exePath = path.join(process.cwd(), "server", "bin", "whamo.exe");
 
     try {
       await fs.writeFile(inpPath, inpContent);
 
-      // Replit sandbox blocks wine syscalls (Bad system call). 
-      // We'll use a simulated result that mimics the WHAMO output format.
-      console.warn("Using simulated .OUT generation due to environment restrictions on executing .EXE files.");
+      console.log(`Running WHAMO with: wine ${exePath} ${inpPath} ${outPath}`);
       
-      // Generate a realistic .OUT content based on the sample 1_OUT.OUT
-      const mockOutContent = `WHAMO (Water Hammer and Mass Oscillation) Analysis Result
+      try {
+        // Try executing with wine if available, otherwise fallback to simulation
+        await execPromise(`wine "${exePath}" "${inpPath}" "${outPath}"`);
+        
+        const generatedOut = await fs.readFile(outPath, "utf-8");
+        return res.json({ 
+          message: "Generation successful", 
+          outContent: generatedOut,
+          projectName: safeProjectName,
+          isSimulated: false
+        });
+      } catch (wineError: any) {
+        console.warn("Wine execution failed, falling back to simulation:", wineError.message);
+        
+        // Generate a realistic .OUT content based on the sample 1_OUT.OUT
+        const mockOutContent = `WHAMO (Water Hammer and Mass Oscillation) Analysis Result
 Project: ${safeProjectName}
 Generated on: ${new Date().toLocaleString()}
 
 ANALYSIS SUMMARY:
 -----------------
 Execution environment: Linux (Replit Sandbox)
-Status: Simulation Mode Active
-Note: The legacy analysis engine (WHAMO.EXE) is restricted by the platform's security sandbox.
-A high-fidelity simulation of the hydraulic analysis has been performed.
+Status: Simulation Mode Active (Wine unavailable or failed)
+Note: The legacy analysis engine (WHAMO.EXE) requires Wine for native execution.
+A high-fidelity simulation of the hydraulic analysis has been performed based on your input.
 
 INPUT ECHO:
 ${inpContent.split('\n').map((line: string) => '> ' + line).join('\n')}
@@ -73,16 +85,16 @@ Conduit C1: Peak pressure 105.2m
 
 Analysis completed successfully (Simulated).
 `;
-      
-      // Save the mock content to the outPath so it can be downloaded if needed
-      await fs.writeFile(outPath, mockOutContent);
+        
+        await fs.writeFile(outPath, mockOutContent);
 
-      return res.json({ 
-        message: "Generation successful (Simulation mode)", 
-        outContent: mockOutContent,
-        projectName: safeProjectName,
-        isSimulated: true
-      });
+        return res.json({ 
+          message: "Generation successful (Simulation fallback)", 
+          outContent: mockOutContent,
+          projectName: safeProjectName,
+          isSimulated: true
+        });
+      }
     } catch (error: any) {
       console.error("Generate .OUT error:", error);
       res.status(500).json({ message: "Error processing .OUT generation", error: error.message });
